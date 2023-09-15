@@ -1,0 +1,8 @@
+logger:
+  type: "devcont"
+  name: "Someame"
+  env: "devcontainer"
+api:
+  scheme: "http"
+  host: "0.0.0.0"
+  port: 8080

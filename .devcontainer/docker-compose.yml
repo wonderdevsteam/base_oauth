@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  base_oauth:
+    volumes:
+      - .:/workspace:cached
+      - base-oauth-home:/home/vscode
+volumes:
+  base-oauth-home:

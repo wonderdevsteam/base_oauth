@@ -1,0 +1,130 @@
+name: audit backend pr
+on:
+    
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - dash
+      - "docker-compose.yml"
+      - "**.md"
+      - ".devcontainer"
+      - "docs"
+      - "Makefile"
+      - "credentials"
+      - ".thunderclient"
+      - ".env.sample"
+      - ".gitignore"
+      - "docker-compose.yml"
+      - "bot/shared"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+env:
+  ENV: "test"
+  LOG_NAME: "test"
+  LOG_HANDLER: "gcp"
+  LOG_LEVEL: "ERROR"
+  POSTGRES_HOST: "0.0.0.0"
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: boyDev2021*
+  POSTGRES_ADAPTER: postgresql
+  POSTGRES_DB: betonyou
+  POSTGRES_OPTS: sslmode=disable
+  WORK_DIR: bot
+
+
+jobs:
+  setup:
+    defaults:
+      run:
+        working-directory: ${{ env.WORK_DIR }}
+    timeout-minutes: 10
+    name: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+        with:
+          requirement_files: bot/setup.*
+
+      - uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+        with:
+          requirement_files: bot/setup.*
+
+      - name: install dependencies
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+        run: |
+          pip install -e ".[ci]"
+
+  lint:
+    defaults:
+      run:
+        working-directory: ${{ env.WORK_DIR }}
+    timeout-minutes: 5
+    needs:
+      - setup
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: restore dependencies
+        uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+        with:
+          requirement_files: bot/setup.*
+
+      - name: setup env
+        run: cp .env.sample .env
+
+      - name: lint
+        run: make lint
+
+  security:
+    defaults:
+      run:
+        working-directory: ${{ env.WORK_DIR }}
+    timeout-minutes: 5
+    needs:
+      - setup
+    name: security
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+
+      - name: restore dependencies
+        uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+        with:
+          requirement_files: bot/setup.*
+
+      - name: setup env
+        run: cp .env.sample .env
+
+      - name: bandit
+        run: make bandit-ci

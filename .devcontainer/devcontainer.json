@@ -1,0 +1,43 @@
+{
+  "name": "Base oauth",
+  "dockerComposeFile": ["../docker-compose.yml", "docker-compose.yml"],
+  "service": "base_oauth",
+  "workspaceFolder": "/home/app",
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "cd infra/images/local/gitutils && ./install.sh && git config --global pull.rebase true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+		"visualstudioexptteam.vscodeintellicode",
+		"redhat.vscode-yaml",
+		"ryanluker.vscode-coverage-gutters",
+		"mikestead.dotenv",
+		"alanwalk.markdown-toc",
+		"darkriszty.markdown-table-prettify",
+		"2gua.rainbow-brackets",
+		"brainfit.vscode-importmagic",
+		"davidanson.vscode-markdownlint",
+		"eamodio.gitlens",
+		"golang.go",
+		"msyrus.go-doc",
+		"766b.go-outliner",
+		"premparihar.gotestexplorer",
+		"aleksandra.go-group-imports",
+		"Postman.postman-for-vscode"
+	],
+      "settings": {
+        "files.trimTrailingWhitespace": true,
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/usr/bin/zsh",
+            "args": ["-l"]
+          }
+        },
+        "coverage-gutters.coverageReportFileName": "coverage/index.html",
+        "coverage-gutters.showLineCoverage": true,
+        "coverage-gutters.showRulerCoverage": true,
+        "files.eol": "\n"
+      }
+    }
+  }
+}

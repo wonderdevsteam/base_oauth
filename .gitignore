@@ -19,3 +19,11 @@
 
 # Go workspace file
 go.work
+.idea
+.env
+!.env.sample
+
+# thunder client
+thunder-tests/thunderEnvironment.db
+thunderActivity.db
+thunderActivity.json
